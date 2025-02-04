@@ -1,0 +1,87 @@
+
+{% extends "base.html" %}
+{% load static %}
+
+{% block content %}
+    
+<div class="container mx-auto p-4">
+
+
+
+<!-- Hero Section -->
+<div class="flex flex-col md:flex-row items-center bg-black">
+    <!-- Text Section -->
+    <div class="w-full md:w-1/2 p-8 flex flex-col justify-center items-start">
+        <div>
+            <h1 class="text-4xl font-bold text-gray-50">Unleash the Power of Every Event</h1>
+            <p class="text-2xl mt-4 text-gray-100">Where Moments Become Memories!</p>
+        </div>
+        <!-- Adjusted Button -->
+        <a href="{% url 'event_create' %}" class="mt-6 bg-[#FF6347] hover:bg-[#FF4500] text-white font-semibold px-6 py-3 rounded-lg shadow-lg transition duration-300 ease-in-out transform hover:-translate-y-1">
+            Create Your Event
+        </a>
+        {% comment %} search buttun {% endcomment %}
+        <div class="flex items-center justify-center space-x-4 mb-5">
+        
+            <form method="get" class="flex items-center space-x-2 mt-8">
+                <input type="text" name="search" value="{{ search_query }}" placeholder="Search events..." class="border rounded p-2 shadow-md border-[#FF6347]">
+                <button type="submit" class=" bg-[#FF6347] hover:bg-[#FF4500] text-white font-semibold px-6 py-2 rounded-lg shadow-lg transition duration-300 ease-in-out transform hover:-translate-y-1">
+                    Search
+                </button>
+            </form>
+        </div>
+    </div>
+    <!-- Image Section -->
+    <div class="w-full md:w-1/2">
+        <img src="{% static 'images/hero.jpg' %}" alt="Hero Image" class="w-full h-auto">
+    </div>
+</div>
+
+
+
+
+
+
+    
+
+<h1 class="text-2xl font-bold mb-4">All Events</h1>
+
+
+<form method="get" class="mt-4 flex gap-4">
+    <select name="category" class="border rounded p-2 shadow-md border-[#FF6347]">
+        <option value="">All Categories</option>
+        {% for category in categories %}
+            <option value="{{ category.id }}">{{ category.name }}</option>
+        {% endfor %}
+    </select>
+    <input type="date" name="start_date" class="border rounded p-2 shadow-md border-[#FF6347]">
+    <input type="date" name="end_date" class="border rounded p-2 shadow-md border-[#FF6347]">
+    <button type="submit" class="bg-[#FF6347] hover:bg-[#FF4500] text-white font-semibold px-4 py-2 rounded-lg shadow-lg transition duration-300 ease-in-out transform hover:-translate-x-1">Filter</button>
+    {% comment %} <a type="submit" class=" bg-[#FF6347] hover:bg-[#FF4500] text-white font-semibold px-6 py-2 rounded-lg shadow-lg transition duration-300 ease-in-out transform hover:-translate-y-1">Filter</a> {% endcomment %}
+</form>
+
+
+    <ul class="mt-6 space-y-4">
+        {% for event in events %}
+            <li class="border  border-[#FF6347] rounded p-4 flex justify-between items-center">
+                <div>
+                    <h2 class="text-xl font-semibold text-white">{{ event.name }}</h2>
+                    <p class="text-gray-100">{{ event.description }}</p>
+                    <p class="text-sm text-gray-100">Category: {{ event.category.name }}</p>
+                    <p class="text-sm text-gray-100">Participants: {{ event.participant_count }}</p>
+                </div>
+                <div class="flex gap-2">
+                    <a href="{% url 'event_detail' event.id %}" class="bg-blue-400 text-white px-3 py-1 rounded">View</a>
+                    <a href="{% url 'event_update' event.id %}" class="bg-yellow-400 text-white px-3 py-1 rounded">Edit</a>
+                    <form action="{% url 'event_delete' event.id %}" method="post">
+                        {% csrf_token %}
+                        <button type="submit" class="bg-red-500 text-white px-3 py-1 rounded">Delete</button>
+                    </form>
+                </div>
+            </li>
+        {% endfor %}
+    </ul>
+</div>  
+
+
+{% endblock %}

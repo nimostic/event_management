@@ -1,0 +1,52 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="container mx-auto mt-10 p-6 max-w-3xl bg-[#231F10] rounded-lg shadow-md">
+  <!-- Event Title -->
+  <h1 class="text-4xl font-bold text-white mb-6">{{ event.name }}</h1>
+
+  <!-- Event Description -->
+  <p class="text-gray-50 text-lg leading-relaxed mb-8">{{ event.description }}</p>
+
+  <!-- Event Details -->
+  <div class="mb-8">
+    <h2 class="text-2xl font-semibold text-white mb-4">Event Details</h2>
+    <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+      <div>
+        <p class="font-semibold text-white"><span class="">Location:</span> {{ event.location }}</p>
+        <p class="font-semibold text-white"><span class="">Category:</span> {{ event.category.name }}</p>
+      </div>
+      <div>
+        <p class="font-semibold text-white"><span class="">Date:</span> {{ event.date }}</p>
+        <p class="font-semibold text-white"><span class="">Time:</span> {{ event.time }}</p>
+      </div>
+    </div>
+  </div>
+
+  <!-- Participants -->
+  <div class="mb-8">
+    <h2 class="text-2xl font-semibold text-white mb-4">Participants</h2>
+    {% if participants %}
+      <ul class="divide-y divide-gray-200">
+        {% for participant in participants %}
+          <li class="py-4 flex items-center">
+            <div class="ml-3">
+              <p class="text-lg font-medium text-white">{{ participant.name }}</p>
+              <p class="text-sm text-gray-50">{{ participant.email }}</p>
+            </div>
+          </li>
+        {% endfor %}
+      </ul>
+    {% else %}
+      <p class="text-gray-50">No participants yet.</p>
+    {% endif %}
+  </div>
+
+  <!-- Back Button -->
+  <div class="text-center">
+    <a href="{% url 'event_list' %}" class="inline-block bg-[#FF6347] hover:bg-[#FF4500] text-white font-semibold px-8 py-3 rounded-full shadow-lg transition duration-300 ease-in-out transform hover:-translate-y-1">
+      Back to Events
+    </a>
+  </div>
+</div>
+{% endblock %}

@@ -1,0 +1,26 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="container mx-auto p-6 m-5 max-w-lg bg-[#231f10] rounded-lg shadow-md">
+    <h1 class="text-2xl font-semibold text-white mb-4">{{ form.instance.id|yesno:"Update,Create" }} Event</h1>
+    
+    <form method="post">
+        {% csrf_token %}
+        
+        <div class="space-y-4">
+            {% for field in form %}
+                <div>
+                    <label class="block text-yellow-400 font-medium">{{ field.label }}</label>
+                    {{ field }}
+                </div>
+            {% endfor %}
+        </div>
+        
+        <div class="mt-6 flex justify-between items-center">
+            <button type="submit" class="bg-yellow-500 text-white py-2 px-4 rounded-lg hover:bg-[#FF5A0B] focus:outline-none focus:ring-2 focus:ring-blue-400">Save</button>
+            <a href="{% url 'event_list' %}" class="text-gray-600 hover:text-gray-800 bg-red-300 py-2 px-4 rounded-lg hover:bg-red-600">Cancel</a>
+            
+        </div>
+    </form>
+</div>
+{% endblock %}
