@@ -12,7 +12,7 @@ https://docs.djangoproject.com/en/5.1/ref/settings/
 
 from pathlib import Path
 import os
-
+import dj_database_url
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
 
@@ -89,16 +89,25 @@ WSGI_APPLICATION = 'event_management.wsgi.application'
 #     }
 # }
 
+# DATABASES = {
+#     'default': {
+#         'ENGINE': 'django.db.backends.postgresql',
+#         'NAME': 'event_management',
+#         'USER': 'postgres',
+#         'PASSWORD': '2002',
+#         'HOST': 'localhost',
+#         'PORT': '5432'
+#     }
+# }
+
+# Replace the SQLite DATABASES configuration with PostgreSQL:
+# Replace the SQLite DATABASES configuration with PostgreSQL:
 DATABASES = {
-    'default': {
-        'ENGINE': 'django.db.backends.postgresql',
-        'NAME': 'event_management',
-        'USER': 'postgres',
-        'PASSWORD': '2002',
-        'HOST': 'localhost',
-        'PORT': '5432'
-    }
-}
+    'default': dj_database_url.config(        
+                default='postgresql://event_management_db_vt8h_user:pj1HLVERbryUWiEqhLztiUk1mwxwGwWT@dpg-cuh3jajtq21c73f6ovog-a.oregon-postgres.render.com/event_management_db_vt8h',        
+                conn_max_age=600
+                )}
+
 
 
 
