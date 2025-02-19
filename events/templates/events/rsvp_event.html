@@ -1,0 +1,32 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<div class="max-w-2xl mx-auto bg-white p-6 rounded-lg shadow-lg">
+    <h2 class="text-2xl font-bold text-gray-800">{{ event.title }}</h2>
+    <p class="text-gray-600">{{ event.date }} | {{ event.location }}</p>
+    <p class="mt-4 text-gray-700">{{ event.description }}</p>
+
+    {% if user.is_authenticated %}
+        {% if has_rsvped %}
+            <p class="mt-4 text-green-600 font-semibold">You have already RSVP'd for this event.</p>
+            <form method="post" action="{% url 'cancel_rsvp' event.id %}">
+                {% csrf_token %}
+                <button type="submit" class="mt-4 bg-[#FF6347] text-white px-4 py-2 rounded-lg hover:bg-opacity-80">
+                    Cancel RSVP
+                </button>
+            </form>
+        {% else %}
+            <form method="post" action="{% url 'rsvp_event' event.id %}">
+                {% csrf_token %}
+                <button type="submit" class="mt-4 bg-[#FF6347] text-white px-4 py-2 rounded-lg hover:bg-opacity-80">
+                    RSVP Now
+                </button>
+            </form>
+        {% endif %}
+    {% else %}
+        <p class="mt-4 text-[#FF6347] font-semibold">
+            <a href="{% url 'login' %}?next={{ request.path }}" class="underline">Login</a> to RSVP for this event.
+        </p>
+    {% endif %}
+</div>
+{% endblock %}

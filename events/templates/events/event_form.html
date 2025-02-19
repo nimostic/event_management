@@ -4,7 +4,7 @@
 <div class="container mx-auto p-6 m-5 max-w-lg bg-[#231f10] rounded-lg shadow-md">
     <h1 class="text-2xl font-semibold text-white mb-4">{{ form.instance.id|yesno:"Update,Create" }} Event</h1>
     
-    <form method="post">
+    <form method="POST" enctype="multipart/form-data">
         {% csrf_token %}
         
         <div class="space-y-4">
