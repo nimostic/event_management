@@ -1,0 +1,11 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<div class="container mx-auto p-6 text-center">
+    <h1 class="text-3xl font-bold text-red-600">Access Denied</h1>
+    <p class="text-xl text-gray-200 mt-4">You are not authorized to create an event.</p>
+    <a href="{% url 'event_list' %}" class="mt-6 inline-block bg-[#FF6347] hover:bg-[#FF4500] text-white font-semibold px-6 py-3 rounded-lg shadow-lg transition duration-300 ease-in-out transform hover:-translate-y-1">
+        Back to Events
+    </a>
+</div>
+{% endblock %}

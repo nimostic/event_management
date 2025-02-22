@@ -25,7 +25,11 @@ def is_organizer_or_participant(user):
     return is_organizer(user) or is_participant(user)
 
 @login_required
-@user_passes_test(is_organizer_or_participant)
+def not_authorized(request):
+    return render(request, 'not_authorized.html')
+
+# @login_required
+# @user_passes_test(is_organizer_or_participant)
 def event_list(request):
     events = Event.objects.select_related('category').annotate(participant_count=Count('participants'))
     categories = Category.objects.all()
@@ -41,14 +45,25 @@ def event_list(request):
         events = events.filter(category_id=category_id)
     if start_date and end_date:
         events = events.filter(date__range=[start_date, end_date])
+        
+    is_organizer = False
+    if request.user.is_authenticated:
+        is_organizer = request.user.groups.filter(name="Organizer").exists()
+
+    context = {
+        'events': events,
+        'categories': categories,
+        'search_query': search_query,
+        'is_organizer': is_organizer,
+    }
     
-    return render(request, 'events/event_list.html', {'events': events, 'categories': categories, 'search_query': search_query})
+    return render(request, 'events/event_list.html',context)
 
 @login_required
 @user_passes_test(is_organizer)
 def event_create(request):
     if request.method == 'POST':
-        form = Eventform(request.POST)
+        form = Eventform(request.POST,request.FILES)
         if form.is_valid():
             form.save()
             messages.success(request, "Event Created Successfully!!!")
@@ -68,7 +83,7 @@ def event_detail(request, pk):
 def event_update(request, pk):
     event = get_object_or_404(Event, pk=pk)
     if request.method == 'POST':
-        form = Eventform(request.POST, instance=event)
+        form = Eventform(request.POST, request.FILES,instance=event )
         if form.is_valid():
             form.save()
             messages.success(request, "Event Updated Successfully!!!")
@@ -124,7 +139,11 @@ def dashboard(request):
 @login_required
 def rsvp_event(request, event_id):
     event = get_object_or_404(Event, id=event_id)
-
+    has_rsvped = request.user in event.participants.all()
+    if request.user in event.participants.all():
+        messages.warning(request, "You have already RSVP'd for this event!")
+        return redirect("event_detail", pk=event_id)
+    
     if request.method == "POST":
         form = RSVPForm(request.POST)
         if form.is_valid():
@@ -141,14 +160,18 @@ def rsvp_event(request, event_id):
     else:
             form = RSVPForm(initial={'event_id': event.id})
 
-    return render(request, 'events/rsvp_event.html', {'event': event, 'form': form})
+    return render(request, 'events/rsvp_event.html', {'event': event, 'form': form,  "has_rsvped": has_rsvped})
 
 @login_required
 def cancel_rsvp(request, event_id):
     event = get_object_or_404(Event, id=event_id)
 
-    if request.user in event.participants.all():
-        event.participants.remove(request.user)  # Remove user from participants list
+    if request.method == "POST":
+        if request.user in event.participants.all():
+            event.participants.remove(request.user)
+            messages.success(request, "Your RSVP has been canceled.")
+        else:
+            messages.warning(request, "You were not RSVP'd for this event.")
 
     return redirect('event_detail', pk=event_id)
         
@@ -158,12 +181,22 @@ def signup_view(request):
         if form.is_valid():
             user = form.save(commit=False)
             user.is_active = False  
+            role = request.POST.get('role')
+            if role == 'Organizer':
+                user.is_staff = True
             user.save()
 
             
-            participant_group, created = Group.objects.get_or_create(name="Participant")
-            user.groups.add(participant_group)
+            # assign role based on selection
+            if role == 'Organizer':
+                group = Group.objects.get(name='Organizer')  
+                user.groups.add(group) 
+                user.user_permissions.set(group.permissions.all())  
+                user.save()
 
+            elif role == 'Participant':
+                group = Group.objects.get(name='Participant')
+                user.groups.add(group)
            
             token = default_token_generator.make_token(user)
             activation_url = f"{settings.FRONTEND_URL}/activate/{user.id}/{token}/"
@@ -211,7 +244,8 @@ def organizer_dashboard(request):
 
 @login_required
 def participant_dashboard(request):
-    return render(request, "events/participant_dashboard.html")
+    rsvp_events = request.user.rsvp_events.all()
+    return render(request, "events/participant_dashboard.html",{"rsvp_events": rsvp_events})
 
 
 
@@ -221,7 +255,8 @@ def login_view(request):
         if form.is_valid():
             user = form.get_user()
             login(request,user)
-            
+            print(f"User {user.username} groups: {[group.name for group in user.groups.all()]}")
+             
             if user.groups.filter(name="Admin").exists():
                 return redirect("admin_dashboard")
             elif user.groups.filter(name="Organizer").exists():
@@ -247,7 +282,7 @@ def change_role_view(request):
     if request.method == "POST":
         for user in users:
             selected_role = request.POST.get(f'role_{user.id}')
-            if selected_role:
+            if selected_role and not user.groups.filter(name=selected_role).exists():
                 user.groups.clear()
                 group = Group.objects.get(name=selected_role)
                 user.groups.add(group)

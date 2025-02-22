@@ -15,8 +15,8 @@ class Event(models.Model):
     time = models.TimeField()
     location = models.CharField(max_length=200)
     category = models.ForeignKey(Category, on_delete=models.CASCADE)
-    image = models.ImageField(upload_to='event_images/', default='default_event.jpg')
-    participants = models.ManyToManyField(User, related_name="rsvp_events")  # Renamed for clarity
+    image = models.ImageField(upload_to='events_images',blank=True,null=True,default='events_images/default_event.jpg')
+    participants = models.ManyToManyField(User, related_name="rsvp_events")
 
     def __str__(self):
         return self.name

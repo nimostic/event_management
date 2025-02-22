@@ -13,11 +13,12 @@ urlpatterns = [
     path('organizer-dashboard/', views.organizer_dashboard, name='organizer_dashboard'),
     path('participant-dashboard/', views.participant_dashboard, name='participant_dashboard'),
     
-    path('rsvp/<int:event_id>/', views.rsvp_event, name='rsvp_event'),
-    path('rsvp/<int:event_id>/cancel/', views.cancel_rsvp, name='cancel_rsvp'),
+    path('event/<int:event_id>/rsvp/', views.rsvp_event, name='rsvp_event'),
+    path('event/<int:event_id>/cancel/', views.cancel_rsvp, name='cancel_rsvp'),
     path('signup/', views.signup_view, name='signup'),
     path('login/', views.login_view, name='login'),
     path('logout/', views.logout_view, name='logout'),
     path('change-role/', views.change_role_view, name='change_role'),
     path("activate/<int:user_id>/<str:token>/", views.activate_user, name="activate_user"),
+    path("not_authorized/", views.not_authorized, name='not_authorized'),
 ]

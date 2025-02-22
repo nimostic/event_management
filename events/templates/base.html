@@ -29,12 +29,19 @@
 
                 <!-- Dropdown Menu -->
                 <div id="userDropdown" class="hidden absolute right-0 mt-2 w-48 bg-white rounded-lg shadow-lg">
-                    <a href="{% url 'dashboard' %}" class="block px-4 py-2 text-gray-800 hover:bg-gray-200">Dashboard</a>
+                    {% if user.is_superuser %}
+                    <a href="{% url 'admin_dashboard' %}" class="block px-4 py-2 text-gray-800 hover:bg-gray-200">Admin Dashboard</a>
+                    {% elif is_organizer %}
+                    <a href="{% url 'organizer_dashboard' %}" class="block px-4 py-2 text-gray-800 hover:bg-gray-200">Organizer Dashboard</a>
+                    {% else %}
+                    <a href="{% url 'participant_dashboard' %}" class="block px-4 py-2 text-gray-800 hover:bg-gray-200">{{user.username}} Dashboard</a>
+                    {% endif %}
                     <form method="POST" action="{% url 'logout' %}">
                         {% csrf_token %}
                         <button type="submit" class="block px-4 py-2 text-gray-800 hover:bg-gray-200 w-full text-left">Logout</button>
                     </form>
                 </div>
+
             </div>
             {% else %}
             <div>

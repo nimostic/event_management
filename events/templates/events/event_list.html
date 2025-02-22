@@ -17,9 +17,23 @@
             <p class="text-2xl mt-4 text-gray-100">Where Moments Become Memories!</p>
         </div>
         <!-- Adjusted Button -->
-        <a href="{% url 'event_create' %}" class="mt-6 bg-[#FF6347] hover:bg-[#FF4500] text-white font-semibold px-6 py-3 rounded-lg shadow-lg transition duration-300 ease-in-out transform hover:-translate-y-1">
-            Create Your Event
-        </a>
+       <!-- Adjusted Button for Create Event -->
+            {% if user.is_authenticated %}
+                {% if user.is_superuser or is_organizer %}
+                    <a href="{% url 'event_create' %}" class="mt-6 bg-[#FF6347] hover:bg-[#FF4500] text-white font-semibold px-6 py-3 rounded-lg shadow-lg transition duration-300 ease-in-out transform hover:-translate-y-1">
+                        Create Your Event
+                    </a>
+                {% else %}
+                    <a href="{% url 'not_authorized' %}" class="mt-6 bg-gray-600 cursor-not-allowed text-white font-semibold px-6 py-3 rounded-lg shadow-lg">
+                        Not Authorized
+                    </a>
+                {% endif %}
+            {% else %}
+            <a href="{% url 'login' %}" class="mt-6 bg-[#FF6347] hover:bg-[#FF4500] text-white font-semibold px-6 py-3 rounded-lg shadow-lg transition duration-300 ease-in-out transform hover:-translate-y-1">
+                Login to Create Event
+            </a>
+            {% endif %}
+
         {% comment %} search buttun {% endcomment %}
         <div class="flex items-center justify-center space-x-4 mb-5">
         
